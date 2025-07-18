@@ -6,4 +6,6 @@ import com.security.response.profileresponse.ProfileResponse;
 public interface ProfileService {
 
     ProfileResponse createProfile(ProfileRequest profileRequest);
+
+     ProfileResponse getProfile(String email);
 }

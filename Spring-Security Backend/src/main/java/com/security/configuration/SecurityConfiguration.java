@@ -27,11 +27,15 @@ public class SecurityConfiguration {
 
     private final AppUserDetailsServiceImpl appUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfiguration(AppUserDetailsServiceImpl appUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+
+    public SecurityConfiguration(AppUserDetailsServiceImpl appUserDetailsService, JwtRequestFilter jwtRequestFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.appUserDetailsService = appUserDetailsService;
         this.jwtRequestFilter = jwtRequestFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,7 +57,8 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint));
         return http.build();
     }
 
@@ -70,6 +75,7 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
+
     //For Authentication
     @Bean
     public AuthenticationManager authenticationManager(){

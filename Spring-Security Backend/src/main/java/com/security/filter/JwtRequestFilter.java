@@ -36,10 +36,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/logout",
             "/v3/api-docs",
             "/v3/api-docs/",
-            "/v3/api-docs/*",
+            "/v3/api-docs/**",
             "/swagger-ui",
             "/swagger-ui/",
-            "/swagger-ui/*",
+            "/swagger-ui/**",
             "/swagger-ui.html"
     );
 

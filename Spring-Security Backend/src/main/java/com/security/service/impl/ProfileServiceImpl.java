@@ -7,6 +7,7 @@ import com.security.request.profilerequest.ProfileRequest;
 import com.security.response.profileresponse.ProfileResponse;
 import com.security.service.ProfileService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,6 +36,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
+    @Override
+    public ProfileResponse getProfile(String email) {
+      User existingUser =   userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"+email));
+        return convertToProfileResponse(existingUser);
+    }
+
     private ProfileResponse convertToProfileResponse(User newProfile) {
         return ProfileResponse.builder()
                 .userId(newProfile.getUserId())
@@ -56,5 +64,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .verifyOtpExpireAt(0L)
                 .resetOtp(null)
                 .build();
+
+
     }
 }
