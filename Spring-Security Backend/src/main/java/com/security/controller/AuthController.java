@@ -118,6 +118,18 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
         }
     }
+    @PostMapping("/verify-otp")
+    public void verifyEmail(@RequestBody Map<String,Object> request,@CurrentSecurityContext(expression = "authentication?.name") String email){
+
+        if(request.get("otp").toString() == null){
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"Missing Details");
+        }
+        try{
+            profileService.verifyOtp(email,request.get("otp").toString());
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
+    }
 
 }
 
