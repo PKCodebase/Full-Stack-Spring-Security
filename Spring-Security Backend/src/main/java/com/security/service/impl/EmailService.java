@@ -13,16 +13,31 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
 
-
     @Value("${spring.mail.from}")
     private String fromEmail;
 
-    public void sendWelcomeEmail(String toEmail,String name){
+    public void sendWelcomeEmail(String toEmail, String name) {
+        try {
+            System.out.println("Sending welcome email to " + toEmail);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail); // make sure it's not null!
+            message.setTo(toEmail);
+            message.setSubject("Welcome to Pioneer Solution");
+            message.setText("Hello " + name + ",\n\nThanks for registering with us!");
+            mailSender.send(message);
+            System.out.println("Email sent successfully");
+        } catch (Exception e) {
+            System.out.println("Failed to send email: " + e.getMessage());
+            // Optional
+        }
+    }
+
+    public void  sendResetOtpEmail(String toEmail,String otp){
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
         message.setTo(toEmail);
-        message.setSubject("Welcome to Pioneer Solution");
-        message.setText("Hello "+name+",\n\n Thanks for registering with us! \n\n Regards, \n Authify team");
+        message.setFrom(fromEmail);
+        message.setSubject("Password Reset OTP");
+        message.setText("Your Otp for resetting you password is " + otp + " . Use this otp to proceed with resetting your password ");
         mailSender.send(message);
     }
 }

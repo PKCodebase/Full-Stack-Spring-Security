@@ -25,6 +25,7 @@ public class ProfileController {
     }
 
 
+    //1.
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileResponse register(@Valid @RequestBody ProfileRequest profileRequest){
@@ -35,10 +36,12 @@ public class ProfileController {
 
     }
 
+    //2.
     @GetMapping("/profile")
    public ProfileResponse getProfile(@CurrentSecurityContext(expression = "authentication?.name") String email){
         return profileService.getProfile(email);
 
    }
+
 
 }

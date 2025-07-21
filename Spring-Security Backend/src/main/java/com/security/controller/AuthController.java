@@ -1,9 +1,12 @@
 package com.security.controller;
 
 import com.security.request.authrequest.AuthRequest;
+import com.security.request.resetpasswordrequest.ResetPasswordRequest;
 import com.security.response.authresponse.AuthResponse;
+import com.security.service.ProfileService;
 import com.security.service.impl.AppUserDetailsServiceImpl;
 import com.security.util.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -11,11 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -28,13 +30,16 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsServiceImpl appUserDetailsService;
     private final JwtUtil jwtUtil;
+    private final ProfileService profileService;
 
-    public AuthController(AuthenticationManager authenticationManager, AppUserDetailsServiceImpl appUserDetailsService, JwtUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager, AppUserDetailsServiceImpl appUserDetailsService, JwtUtil jwtUtil, ProfileService profileService) {
         this.authenticationManager = authenticationManager;
         this.appUserDetailsService = appUserDetailsService;
         this.jwtUtil = jwtUtil;
+        this.profileService = profileService;
     }
 
+    //3.
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody AuthRequest authRequest){
         try{
@@ -77,6 +82,43 @@ public class AuthController {
             throw new BadCredentialsException("INVALID_CREDENTIALS", e);
         }
     }
+
+    //4.
+    @GetMapping("/isAuthenticated")
+    public  ResponseEntity<Boolean> isAuthenticated(@CurrentSecurityContext(expression = "authentication?.name")String email){
+        return ResponseEntity.ok(email != null);
+}
+
+
+    //5.
+    @PostMapping("/send-reset-otp")
+    public void sendResetOtp(@RequestParam String email){
+        try{
+            profileService.sendResetOtp(email);
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
+        }
+    }
+
+    //6.
+    @PostMapping("/reset-password")
+    public void resetPassword(@Valid @RequestBody ResetPasswordRequest request){
+        try{
+            profileService.resetPassword(request.getEmail(),request.getOtp(),request.getNewPassword());
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
+        }
+    }
+
+    @PostMapping("/send-otp")
+    public void sendVerifyOtp(@CurrentSecurityContext(expression = "authentication?.name") String email){
+        try{
+            profileService.sendOtp(email);
+        }catch (Exception ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
+        }
+    }
+
 }
 
 

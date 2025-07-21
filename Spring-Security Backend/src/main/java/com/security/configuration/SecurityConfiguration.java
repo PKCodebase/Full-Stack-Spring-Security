@@ -50,6 +50,8 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/login",
                                 "/register",
+                                "/send-reset-otp",
+                                "/reset-password",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
